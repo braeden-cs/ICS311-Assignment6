@@ -22,7 +22,7 @@ public class problem3{
         wordCloud.setPadding(2);
         wordCloud.setBackground(new CircleBackground(300));
         wordCloud.setColorPalette(new ColorPalette(new Color(0x4055F1), new Color(0x408DF1), new Color(0x40AAF1), new Color(0x40C5F1), new Color(0x40D3F1), new Color(0xFFFFFF)));
-        wordCloud.setFontScalar(new SqrtFontScalar(10, 50));
+        wordCloud.setFontScalar(new SqrtFontScalar(10, 100));
         wordCloud.build(wordFrequencies);
         wordCloud.writeToFile("wordcloud.png");
     }
