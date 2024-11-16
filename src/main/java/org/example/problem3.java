@@ -42,7 +42,7 @@ public class problem3 extends JPanel{
         frequencyAnalyzer.setWordFrequenciesToReturn(300);
         frequencyAnalyzer.setMinWordLength(5);
 
-        final List<WordFrequency> wordFrequencies = frequencyAnalyzer.load(getInputStream("C:\\Users\\braeb\\IdeaProjects\\untitled1\\src\\main\\java\\org\\example\\lyrics.txt"));
+        final List<WordFrequency> wordFrequencies = frequencyAnalyzer.load(getInputStream("org/example/lyrics.txt"));
         final Dimension dimension = new Dimension(600, 600);
         final WordCloud wordCloud = new WordCloud(dimension, CollisionMode.PIXEL_PERFECT);
         wordCloud.setPadding(2);
