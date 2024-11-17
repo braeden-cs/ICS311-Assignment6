@@ -14,10 +14,22 @@ import java.util.*;
 import java.util.List;
 
 public class problem4 {
-    HashMap<String, User> users;
-
 
     public static void main(String[] args) throws IOException {
+        HashMap<String, User> users;
+        List<User> views1 = new ArrayList<>();
+        List<String> connections1 = new ArrayList<>();
+        List<Post> authoredPosts1 = new ArrayList<>();
+        List<Post> readPosts1 = new ArrayList<>();
+        List<Comment> comments1 = new ArrayList<>();
+
+        User user1 = new User("John", connections1,authoredPosts1, readPosts1, comments1);
+        User user2 = new User("Doe", null, null,null,null);
+
+        Post post1 = new Post("hello, this is post 1", "2024-11-15T04:00" , views1);
+        views1.add(user2);
+        authoredPosts1.add(post1);
+
         final FrequencyAnalyzer frequencyAnalyzer = new FrequencyAnalyzer();
         frequencyAnalyzer.setWordFrequenciesToReturn(300);
         final List<WordFrequency> wordFrequencies = frequencyAnalyzer.load("lyrics.txt");
