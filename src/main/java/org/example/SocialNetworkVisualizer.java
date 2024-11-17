@@ -2,9 +2,16 @@ package org.example;
 
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.*;
-import org.graphstream.ui.layout.springbox.implementations.SpringBox;
 import org.graphstream.ui.view.Viewer;
-import java.util.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Scanner;
 
 public class SocialNetworkVisualizer {
     private Graph graph;
@@ -12,6 +19,8 @@ public class SocialNetworkVisualizer {
     private Map<String, Node> postNodes;
     private ImportanceCriteria currentCriteria;
     private Map<String, Post> postsById;
+    private JFrame controlPanel;
+    private Map<String, Double> postScores;
     
     public enum ImportanceCriteria {
         VIEWS,
@@ -25,12 +34,14 @@ public class SocialNetworkVisualizer {
         userNodes = new HashMap<>();
         postNodes = new HashMap<>();
         postsById = new HashMap<>();
-        currentCriteria = ImportanceCriteria.VIEWS;
+        postScores = new HashMap<>();
+        currentCriteria = ImportanceCriteria.COMBINED;
         
         setupStyles();
+        createControlPanel();
     }
 
-private void setupStyles() {
+    private void setupStyles() {
         String css = String.join("\n",
             "node {",
             "   size: 35px;",
@@ -51,9 +62,9 @@ private void setupStyles() {
             "   z-index: 1;",
             "}",
             "node.post {",
-            "   fill-color: rgb(255,228,196);",  // Lighter peach color
+            "   fill-color: rgb(255,228,196);",
             "   stroke-color: rgb(235,198,165);",
-            "   shape: rounded-box;",  // Changed to rounded box
+            "   shape: rounded-box;",
             "   size: 45px;",
             "   z-index: 0;",
             "}",
@@ -85,32 +96,140 @@ private void setupStyles() {
         graph.setAttribute("ui.antialias");
     }
 
-    // Add this method to control the layout
-    private void applyLayout() {
-        for (Node node : graph) {
-            // Add some random positioning to avoid overlaps
-            double x = Math.random() * 100 - 50;
-            double y = Math.random() * 100 - 50;
-            node.setAttribute("xy", x, y);
+    private void createControlPanel() {
+        controlPanel = new JFrame("Social Network Analysis Controls");
+        controlPanel.setSize(400, 300);
+        controlPanel.setLayout(new BorderLayout());
+
+        // Create importance criteria selector
+        JPanel criteriaPanel = new JPanel();
+        criteriaPanel.setBorder(BorderFactory.createTitledBorder("Importance Criteria"));
+        ButtonGroup group = new ButtonGroup();
+        
+        JRadioButton viewsButton = new JRadioButton("Views");
+        JRadioButton commentsButton = new JRadioButton("Comments");
+        JRadioButton combinedButton = new JRadioButton("Combined");
+        
+        group.add(viewsButton);
+        group.add(commentsButton);
+        group.add(combinedButton);
+        
+        criteriaPanel.add(viewsButton);
+        criteriaPanel.add(commentsButton);
+        criteriaPanel.add(combinedButton);
+
+        // Create stats panel
+        JPanel statsPanel = new JPanel();
+        statsPanel.setBorder(BorderFactory.createTitledBorder("Post Statistics"));
+        statsPanel.setLayout(new BoxLayout(statsPanel, BoxLayout.Y_AXIS));
+        JTextArea statsArea = new JTextArea(8, 30);
+        statsArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(statsArea);
+        statsPanel.add(scrollPane);
+
+        // Add action listeners
+        ActionListener criteriaListener = e -> {
+            if (e.getSource() == viewsButton) {
+                setImportanceCriteria(ImportanceCriteria.VIEWS);
+            } else if (e.getSource() == commentsButton) {
+                setImportanceCriteria(ImportanceCriteria.COMMENTS);
+            } else {
+                setImportanceCriteria(ImportanceCriteria.COMBINED);
+            }
+            updateStatsDisplay(statsArea);
+            updateImportantPosts();  // Make sure visualization updates
+        };
+
+        viewsButton.addActionListener(criteriaListener);
+        commentsButton.addActionListener(criteriaListener);
+        combinedButton.addActionListener(criteriaListener);
+
+        // Default selection
+        combinedButton.setSelected(true);
+
+        // Add refresh button with enhanced action
+        JButton refreshButton = new JButton("Refresh Analysis");
+        refreshButton.addActionListener(e -> {
+            System.out.println("Refreshing analysis..."); // Debug output
+            ImportanceCriteria currentSelection = ImportanceCriteria.COMBINED;
+            if (viewsButton.isSelected()) {
+                currentSelection = ImportanceCriteria.VIEWS;
+            } else if (commentsButton.isSelected()) {
+                currentSelection = ImportanceCriteria.COMMENTS;
+            }
+            
+            setImportanceCriteria(currentSelection);
+            updateImportantPosts();
+            updateStatsDisplay(statsArea);
+            graph.setAttribute("ui.refresh"); // Force graph refresh
+        });
+
+        // Add panels to frame
+        controlPanel.add(criteriaPanel, BorderLayout.NORTH);
+        controlPanel.add(statsPanel, BorderLayout.CENTER);
+        controlPanel.add(refreshButton, BorderLayout.SOUTH);
+    }
+
+    public void setImportanceCriteria(ImportanceCriteria criteria) {
+        System.out.println("Setting importance criteria to: " + criteria); // Debug output
+        this.currentCriteria = criteria;
+        updateImportantPosts();
+    }
+
+    private void updateImportantPosts() {
+        System.out.println("Updating important posts..."); // Debug output
+        
+        // Reset all posts to normal styling
+        postNodes.values().forEach(node -> {
+            node.setAttribute("ui.class", "post");
+            System.out.println("Reset node: " + node.getId());
+        });
+        
+        // Calculate and store scores
+        postScores.clear();
+        for (String postId : postsById.keySet()) {
+            Post post = postsById.get(postId);
+            double score = calculateImportanceScore(post, currentCriteria);
+            postScores.put(postId, score);
+            System.out.println("Post: " + post.getContent() + " Score: " + score);
         }
 
-        // Optional: Add force-directed layout
-        SpringBox layout = new SpringBox();
-        layout.setForce(0.5);
-        layout.setQuality(0.9);
-        layout.compute();
+        // Find and highlight important posts
+        List<Post> importantPosts = findImportantPosts(currentCriteria);
+        
+        // Highlight important posts
+        for (Post post : importantPosts) {
+            Node node = postNodes.get("post_" + post.hashCode());
+            if (node != null) {
+                node.setAttribute("ui.class", "post important");
+                System.out.println("Highlighted post: " + post.getContent());
+            }
+        }
+        
+        // Force graph refresh
+        graph.setAttribute("ui.refresh");
     }
 
-    public void display() {
-        applyLayout();  // Add this line
-        Viewer viewer = graph.display();
-        viewer.setCloseFramePolicy(Viewer.CloseFramePolicy.HIDE_ONLY);
-    }
+    private void updateStatsDisplay(JTextArea statsArea) {
+        StringBuilder stats = new StringBuilder();
+        stats.append("Current Importance Criteria: ").append(currentCriteria).append("\n\n");
 
-    private String truncateContent(String content) {
-        return content.length() > 25 ? 
-            content.substring(0, 22) + "..." : 
-            content;
+        List<Map.Entry<String, Double>> sortedPosts = new ArrayList<>(postScores.entrySet());
+        sortedPosts.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
+
+        for (Map.Entry<String, Double> entry : sortedPosts) {
+            Post post = postsById.get(entry.getKey());
+            if (post != null) {
+                stats.append("Post: ").append(truncateContent(post.getContent())).append("\n");
+                stats.append("Views: ").append(post.getAmountOfViews()).append("\n");
+                stats.append("Comments: ").append(post.getComments().size()).append("\n");
+                stats.append("View Rate: ").append(String.format("%.2f", post.getViewRate())).append("\n");
+                stats.append("Importance Score: ").append(String.format("%.2f", entry.getValue())).append("\n\n");
+            }
+        }
+
+        statsArea.setText(stats.toString());
+        statsArea.setCaretPosition(0); // Scroll to top
     }
 
     public void createUser(User user) {
@@ -164,28 +283,6 @@ private void setupStyles() {
         }
     }
 
-    public void setImportanceCriteria(ImportanceCriteria criteria) {
-        this.currentCriteria = criteria;
-        updateImportantPosts();
-    }
-
-    private void updateImportantPosts() {
-        // Reset all posts to normal styling
-        postNodes.values().forEach(node -> 
-            node.setAttribute("ui.class", "post"));
-        
-        // Find and highlight important posts
-        List<Post> importantPosts = findImportantPosts(currentCriteria);
-        
-        // Highlight important posts
-        for (Post post : importantPosts) {
-            Node node = postNodes.get("post_" + post.hashCode());
-            if (node != null) {
-                node.setAttribute("ui.class", "post important");
-            }
-        }
-    }
-
     private List<Post> findImportantPosts(ImportanceCriteria criteria) {
         List<Post> allPosts = new ArrayList<>(postsById.values());
 
@@ -217,7 +314,43 @@ private void setupStyles() {
         }
     }
 
-    // Example usage
+    private String truncateContent(String content) {
+        return content.length() > 25 ? 
+            content.substring(0, 22) + "..." : 
+            content;
+    }
+
+    public void display() {
+        Viewer viewer = graph.display();
+        viewer.setCloseFramePolicy(Viewer.CloseFramePolicy.HIDE_ONLY);
+        
+        // Show control panel - position it in the center of the screen initially
+        try {
+            // Get the screen size
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            
+            // Position the control panel on the right side of the screen
+            int x = (screenSize.width - controlPanel.getWidth() - 20);  // 20 pixels from right edge
+            int y = (screenSize.height - controlPanel.getHeight()) / 2;  // Vertically centered
+            
+            controlPanel.setLocation(x, y);
+            controlPanel.setVisible(true);
+            
+            // Optional: Add window listener to keep control panel visible
+            controlPanel.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowIconified(WindowEvent e) {
+                    controlPanel.setExtendedState(JFrame.NORMAL);
+                }
+            });
+            
+        } catch (Exception e) {
+            // Fallback: center the control panel on screen
+            controlPanel.setLocationRelativeTo(null);
+            controlPanel.setVisible(true);
+        }
+    }
+
     public static void main(String[] args) {
         // Create test data
         TestData testData = new TestData();
@@ -242,23 +375,6 @@ private void setupStyles() {
 
         // Display the graph
         visualizer.display();
-
-        // Test different importance criteria
-        try {
-            Thread.sleep(3000);
-            System.out.println("Switching to Views importance...");
-            visualizer.setImportanceCriteria(ImportanceCriteria.VIEWS);
-            
-            Thread.sleep(3000);
-            System.out.println("Switching to Comments importance...");
-            visualizer.setImportanceCriteria(ImportanceCriteria.COMMENTS);
-            
-            Thread.sleep(3000);
-            System.out.println("Switching to Combined importance...");
-            visualizer.setImportanceCriteria(ImportanceCriteria.COMBINED);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         // Keep program running
         try (Scanner scanner = new Scanner(System.in)) {
