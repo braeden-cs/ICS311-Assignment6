@@ -10,9 +10,12 @@ import com.kennycason.kumo.palette.ColorPalette;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.*;
 import java.util.List;
 
 public class problem3{
+    HashMap<String, User> users;
+
 
     public static void main(String[] args) throws IOException {
         final FrequencyAnalyzer frequencyAnalyzer = new FrequencyAnalyzer();
