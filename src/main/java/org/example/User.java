@@ -17,8 +17,24 @@ public class User {
         this.comments = comments;
     }
 
+    // Add getters
+    public String getUsername() {
+        return username;
+    }
+
     public List<Post> getAuthoredPosts() {
         return authoredPosts;
     }
 
+    public List<String> getConnections() {
+        return connections;
+    }
+
+    public List<Post> getReadPosts() {
+        return readPosts;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
 }
