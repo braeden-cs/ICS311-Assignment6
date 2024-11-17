@@ -5,18 +5,21 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 public class Post {
     private String content;
+    private User author;
     private List<User> views;
     private String creationTime;
     private List<Comment> comments;
 
-    public Post(String content, String creationTime, List<User> views) {
+    public Post(String content, String creationTime, List<User> views, User author) {
         this.content = content;
         this.creationTime = creationTime;
-        this.views = views;
+        this.views = views != null ? views : new ArrayList<>();
         this.comments = new ArrayList<>();
+        this.author = author;
     }
 
     public String getContent(){
@@ -33,6 +36,10 @@ public class Post {
 
     public List<Comment> getComments() {
         return comments;
+    }
+
+    public User getAuthor() {
+        return author;
     }
 
     public long getViewRate() {
@@ -57,5 +64,15 @@ public class Post {
 
     public List<User> getViews() {
         return views;
+    }
+
+    public static List<Post> filterPosts(List<Post> posts, Predicate<User> userCriteria, Predicate<Post> postCriteria) {
+        List<Post> filteredPosts = new ArrayList<>();
+        for (Post post : posts) {
+            if (userCriteria.test(post.getAuthor()) && postCriteria.test(post)) {
+                filteredPosts.add(post);
+            }
+        }
+        return filteredPosts;
     }
 }

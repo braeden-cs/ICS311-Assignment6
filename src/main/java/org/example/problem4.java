@@ -23,10 +23,10 @@ public class problem4 {
         List<Post> readPosts1 = new ArrayList<>();
         List<Comment> comments1 = new ArrayList<>();
 
-        User user1 = new User("John", connections1,authoredPosts1, readPosts1, comments1);
-        User user2 = new User("Doe", null, null,null,null);
+        User user1 = new User("John", 20, "Male", "California", connections1,authoredPosts1, readPosts1, comments1);
+        User user2 = new User("Doe", 27, "Male", "Hawaii", null, null, null, null);
 
-        Post post1 = new Post("hello, this is post 1", "2024-11-15T04:00" , views1);
+        Post post1 = new Post("hello, this is post 1", "2024-11-15T04:00" , views1, user1);
         views1.add(user2);
         authoredPosts1.add(post1);
 

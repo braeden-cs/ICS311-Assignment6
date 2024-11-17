@@ -25,27 +25,30 @@ public class TestData {
         List<Comment> charlieComments = new ArrayList<>();
 
         // Create users
-        User alice = new User("Alice", aliceConnections, alicePosts, aliceReadPosts, aliceComments);
-        User bob = new User("Bob", bobConnections, bobPosts, bobReadPosts, bobComments);
-        User charlie = new User("Charlie", charlieConnections, charliePosts, charlieReadPosts, charlieComments);
+        User alice = new User("Alice", 30, "Female", "Hawaii", aliceConnections, alicePosts, aliceReadPosts, aliceComments);
+        User bob = new User("Bob", 28, "Male", "California", bobConnections, bobPosts, bobReadPosts, bobComments);
+        User charlie = new User("Charlie", 35, "Male", "New York", charlieConnections, charliePosts, charlieReadPosts, charlieComments);
 
         // Create posts with empty view lists and better titles
         Post alicePost = new Post(
-            "Important announcement about new features!", 
-            "2024-11-15T10:00", 
-            new ArrayList<>()
+    "Important announcement about new features!", 
+    "2024-11-15T10:00", 
+            new ArrayList<>(),
+            alice
         );
-        
+
         Post bobPost = new Post(
             "Discussion: Social Network Analysis", 
             "2024-11-15T11:00", 
-            new ArrayList<>()
+            new ArrayList<>(),
+            bob
         );
-        
+
         Post charliePost = new Post(
-            "Breaking news: Tech Innovation", 
+            "Breaking news: Tech Innovation",
             "2024-11-15T12:00", 
-            new ArrayList<>()
+            new ArrayList<>(),
+            charlie
         );
 
         // Add posts to authors
