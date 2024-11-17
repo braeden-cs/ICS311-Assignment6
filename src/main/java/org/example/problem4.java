@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
-public class problem3{
+public class problem4 {
     HashMap<String, User> users;
 
 
