@@ -43,13 +43,14 @@ public class Post {
     }
 
     public long getViewRate() {
-        LocalDateTime currentDateTime = LocalDateTime.now();
+        String currentTime = "2024-11-17T02:30";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         LocalDateTime creationDateTime = LocalDateTime.parse(creationTime, formatter);
+        LocalDateTime currentDateTime = LocalDateTime.parse(currentTime, formatter);
 
         Duration duration = Duration.between(creationDateTime, currentDateTime);
-        long totalSeconds = duration.toMinutes();
-        return views.size()/totalSeconds;
+        long totalHours = duration.toHours();
+        return (views.size() * 1000)/totalHours;
     }
 
     public void addComment(Comment comment) {
