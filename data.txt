@@ -21,7 +21,7 @@ Comment: "Which book?"|Bob|11:45:00|2024-11-15
 
 User: Eve
 Connections: friends:Alice, co-worker:Charlie, blocked:Bob
-Post: "Excited for the holidays!"|2024-11-16T12:00|Alice, Charlie
+Post: "Ooh, what a mesmerizing, paralyzing, fucked-up little thrill Can't figure out just how you do it, and God knows I never will Went for me, and not her satisfaction satisfaction satisfaction"|2024-11-16T12:00|Alice, Charlie
 Post: "Team meeting tomorrow"|2024-11-16T15:00|Charlie
 Comment: "Can’t wait!"|Alice|12:30:00|2024-11-16
 Comment: "Thanks for the reminder!"|Charlie|15:30:00|2024-11-16
@@ -29,13 +29,13 @@ Comment: "Thanks for the reminder!"|Charlie|15:30:00|2024-11-16
 User: Dan
 Connections: follows:Eve, co-worker:Bob
 Post: "Trying out a new recipe"|2024-11-14T18:00|Eve, Bob
-Post: "Back to running!"|2024-11-15T07:30|Alice, Eve
+Post: "Back to running! satisfaction satisfaction satisfaction"|2024-11-15T07:30|Alice, Eve
 Comment: "Share the recipe!"|Eve|18:45:00|2024-11-14
 Comment: "Good for you!"|Alice|08:00:00|2024-11-15
 
 User: Frank
 Connections: follows:Charlie, friends:Dan, co-worker:Alice
-Post: "Big news coming soon!"|2024-11-16T20:00|Alice, Charlie, Dan, Eve, Bob
+Post: "I should've known it was strange You only come out at night I used to think I was smart"|2024-11-16T20:00|Alice, Charlie, Dan, Eve, Bob
 Post: "Hate to give the satisfaction, asking how you're doing now But you make the worst one look fine satisfaction satisfaction satisfaction satisfaction satisfaction"|2024-11-16T21:00|Charlie, Dan
 Comment: "Can’t wait!"|Charlie|20:15:00|2024-11-16
 Comment: "Try 'Hidden Brain'"|Dan|21:30:00|2024-11-16
